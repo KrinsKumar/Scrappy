@@ -24,7 +24,7 @@ process.stdout.write("Body fetched successfully ✅\n");
 // convert the body into md
 process.stdout.write("Converting the body into markdown... ");
 const md = await convertIntoMd(body);
-process.stdout.write("Conversion complete ✅\n");
+process.stdout.write("\nConversion complete ✅\n");
 
 // save the md into the output file
 saveMd(md);

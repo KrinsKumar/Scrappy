@@ -8,6 +8,7 @@ Options:
   -i, --input     Specify the input file
   -o, --output    Specify the output file
   -u, --url       Specify the URL to scrape
+  -v, --version   DIsplay the version of the tool
 
 Examples:
   scrappy -i input.txt -o output.md
@@ -92,10 +93,10 @@ export function validateArgs(args) {
   }
 
   // check if the outfile file is provided
-  if (args.includes("-0") || args.includes("--output")) {
+  if (args.includes("-o") || args.includes("--output")) {
     let index;
-    if (args.includes("-0")) {
-      index = args.indexOf("-0");
+    if (args.includes("-o")) {
+      index = args.indexOf("-o");
     } else {
       index = args.indexOf("--output");
     }
