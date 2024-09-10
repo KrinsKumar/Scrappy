@@ -22,7 +22,7 @@
 
 ## How to use scrappy
 
-<video src='./assets/scrappy-demo.mov' width=max controls></video>
+![](assets/scrappy-demo.gif)
 
 1. Download the repo.
 2. Run the following commands with the updated path variable that points to the location of the repo, run with `sudo` if there is a permission issue.
