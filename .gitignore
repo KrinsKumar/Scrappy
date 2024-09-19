@@ -16,3 +16,6 @@ Thumbs.db
 
 # Ignore dependencies
 node_modules/
+
+#Ignore .env
+.env
