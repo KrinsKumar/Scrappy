@@ -197,18 +197,17 @@ export async function convertIntoMd(body) {
   });
 
   for await (const chunk of chatCompletion) {
-    process.stdout.write(chunk.choices[0]?.delta?.content || "");
+    // process.stdout.write(chunk.choices[0]?.delta?.content || "");
     response += chunk.choices[0]?.delta?.content || "";
+    console.log(chunk);
+    if (chunk.x_groq?.usage) {
+      promptTokens = chunk.x_groq?.usage?.prompt_tokens;
+      responseTokens = chunk.x_groq?.usage?.completion_tokens;
+    }
   }
 
   //remove the first line
   response = response.substring(response.indexOf("\n") + 1);
-
-  // Count the number of tokens from prompt
-  promptTokens = system_message.split(/\s+/).length;
-
-  // Count the number of tokens from response
-  responseTokens = response.split(/\s+/).length;
 
   if (state.tokenUsage) {
     process.stdout.write(`\nPrompt Tokens: ${promptTokens}\n`);
