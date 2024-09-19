@@ -75,6 +75,9 @@ scrappy --a <YOUR_API_KEY>
   scrappy files/input.txt
   ```
 
+  - **Token Usage**: When the program is run with the --token-usage/-t flag set, extra information will be reported to stderr about the number of tokens that were sent in the prompt and returned in the completion.
+    `scrappy files/input.txt --output files/output -t`
+
 ## Contributing
 
 We welcome contributions to improve **Repo Insights**. If you have suggestions, bug reports, or enhancements, please open an issue or submit a pull request.
