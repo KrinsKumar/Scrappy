@@ -12,12 +12,12 @@ const __dirname = path.dirname(__filename);
 const helpTxt = `Usage: scrappy [options] <inputFile> <outputFile> <url>
 
 Options:
-  -h, --help      Display this help message
-  -i, --input     Specify the input file
-  -o, --output    Specify the output file
-  -u, --url       Specify the URL to scrape
-  -v, --version   DIsplay the version of the tool
-
+  -h, --help          Display this help message
+  -i, --input         Specify the input file
+  -o, --output        Specify the output file
+  -u, --url           Specify the URL to scrape
+  -v, --version       DIsplay the version of the tool
+  -t, --token-usage   Display the token usage
 Examples:
   scrappy -i input.txt -o output.md
   scrappy -u https://example.com -o output.md
@@ -33,6 +33,7 @@ let state = {
   outputFile: "",
   url: "",
   apiKey: "",
+  tokenUsage: false,
 };
 
 // will validate the arguments provided and populate the state object.
@@ -120,9 +121,21 @@ export function validateArgs(args) {
       }
     }
     state.outputFile = args[index + 1];
-
-    return state;
   }
+
+  // check if the token usage flag is passed
+  if (args.includes("-t") || args.includes("--token-usage")) {
+    let index;
+    if (args.includes("-t")) {
+      index = args.indexOf("-t");
+    } else {
+      index = args.indexOf("--token-usage");
+    }
+
+    state.tokenUsage = true;
+  }
+
+  return state;
 }
 
 // gets the body of the url provided
@@ -165,6 +178,8 @@ export async function convertIntoMd(body) {
     " -> " +
     body;
   let response = "";
+  let promptTokens;
+  let responseTokens;
 
   const chatCompletion = await groq.chat.completions.create({
     messages: [
@@ -175,7 +190,7 @@ export async function convertIntoMd(body) {
     ],
     model: "llama3-8b-8192",
     temperature: 1,
-    max_tokens: 1024,
+    max_tokens: 4097,
     top_p: 1,
     stream: true,
     stop: null,
@@ -188,6 +203,21 @@ export async function convertIntoMd(body) {
 
   //remove the first line
   response = response.substring(response.indexOf("\n") + 1);
+
+  // Count the number of tokens from prompt
+  promptTokens = system_message.split(/\s+/).length;
+
+  // Count the number of tokens from response
+  responseTokens = response.split(/\s+/).length;
+
+  if (state.tokenUsage) {
+    process.stdout.write(`\nPrompt Tokens: ${promptTokens}\n`);
+    process.stdout.write(`Response Tokens: ${responseTokens}\n`);
+    process.stdout.write(
+      `Completion Tokens: ${responseTokens + promptTokens}\n`
+    );
+  }
+
   return response;
 }
 
