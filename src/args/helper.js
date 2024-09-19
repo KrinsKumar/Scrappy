@@ -1,5 +1,13 @@
 import fs from "fs";
 import { Groq } from "groq-sdk";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+dotenv.config();
+
+// Get the current file path and directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const helpTxt = `Usage: scrappy [options] <inputFile> <outputFile> <url>
 
@@ -43,7 +51,11 @@ export function validateArgs(args) {
     }
     process.env.GROQ_API_KEY = args[index + 1];
     state.apiKey = args[index + 1];
-    process.stdout.write("API key updated");
+    // Write the API key to the .env file
+    const envFilePath = path.resolve(__dirname, "../..", ".env");
+    fs.appendFileSync(envFilePath, `GROQ_API_KEY=${state.apiKey}\n`, "utf8");
+
+    process.stdout.write("API key updated and written to .env file");
     return false;
   }
 
@@ -106,8 +118,8 @@ export function validateArgs(args) {
         process.stderr.write("Please provide the output file");
         process.exit(1);
       }
-      state.outputFile = args[index + 1];
     }
+    state.outputFile = args[index + 1];
 
     return state;
   }
