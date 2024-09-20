@@ -1,15 +1,23 @@
 import fs from "fs";
 import { Groq } from "groq-sdk";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+dotenv.config();
+
+// Get the current file path and directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const helpTxt = `Usage: scrappy [options] <inputFile> <outputFile> <url>
 
 Options:
-  -h, --help      Display this help message
-  -i, --input     Specify the input file
-  -o, --output    Specify the output file
-  -u, --url       Specify the URL to scrape
-  -v, --version   DIsplay the version of the tool
-
+  -h, --help          Display this help message
+  -i, --input         Specify the input file
+  -o, --output        Specify the output file
+  -u, --url           Specify the URL to scrape
+  -v, --version       DIsplay the version of the tool
+  -t, --token-usage   Display the token usage
 Examples:
   scrappy -i input.txt -o output.md
   scrappy -u https://example.com -o output.md
@@ -25,6 +33,7 @@ let state = {
   outputFile: "",
   url: "",
   apiKey: "",
+  tokenUsage: false,
 };
 
 // will validate the arguments provided and populate the state object.
@@ -43,7 +52,11 @@ export function validateArgs(args) {
     }
     process.env.GROQ_API_KEY = args[index + 1];
     state.apiKey = args[index + 1];
-    process.stdout.write("API key updated");
+    // Write the API key to the .env file
+    const envFilePath = path.resolve(__dirname, "../..", ".env");
+    fs.appendFileSync(envFilePath, `GROQ_API_KEY=${state.apiKey}\n`, "utf8");
+
+    process.stdout.write("API key updated and written to .env file");
     return false;
   }
 
@@ -106,11 +119,23 @@ export function validateArgs(args) {
         process.stderr.write("Please provide the output file");
         process.exit(1);
       }
-      state.outputFile = args[index + 1];
+    }
+    state.outputFile = args[index + 1];
+  }
+
+  // check if the token usage flag is passed
+  if (args.includes("-t") || args.includes("--token-usage")) {
+    let index;
+    if (args.includes("-t")) {
+      index = args.indexOf("-t");
+    } else {
+      index = args.indexOf("--token-usage");
     }
 
-    return state;
+    state.tokenUsage = true;
   }
+
+  return state;
 }
 
 // gets the body of the url provided
@@ -153,6 +178,8 @@ export async function convertIntoMd(body) {
     " -> " +
     body;
   let response = "";
+  let promptTokens;
+  let responseTokens;
 
   const chatCompletion = await groq.chat.completions.create({
     messages: [
@@ -163,19 +190,33 @@ export async function convertIntoMd(body) {
     ],
     model: "llama3-8b-8192",
     temperature: 1,
-    max_tokens: 1024,
+    max_tokens: 4097,
     top_p: 1,
     stream: true,
     stop: null,
   });
 
   for await (const chunk of chatCompletion) {
-    process.stdout.write(chunk.choices[0]?.delta?.content || "");
+    // process.stdout.write(chunk.choices[0]?.delta?.content || "");
     response += chunk.choices[0]?.delta?.content || "";
+    console.log(chunk);
+    if (chunk.x_groq?.usage) {
+      promptTokens = chunk.x_groq?.usage?.prompt_tokens;
+      responseTokens = chunk.x_groq?.usage?.completion_tokens;
+    }
   }
 
   //remove the first line
   response = response.substring(response.indexOf("\n") + 1);
+
+  if (state.tokenUsage) {
+    process.stdout.write(`\nPrompt Tokens: ${promptTokens}\n`);
+    process.stdout.write(`Response Tokens: ${responseTokens}\n`);
+    process.stdout.write(
+      `Completion Tokens: ${responseTokens + promptTokens}\n`
+    );
+  }
+
   return response;
 }
 

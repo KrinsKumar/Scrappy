@@ -3,14 +3,19 @@
   "version": "1.0.0",
   "description": "Scrappy",
   "main": "index.js",
+  "bin": {
+    "scrappy": "./src/args/command.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/args/command.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "groq-sdk": "^0.7.0"
   }
 }
