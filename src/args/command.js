@@ -28,3 +28,5 @@ process.stdout.write("\nConversion complete ✅\n");
 
 // save the md into the output file
 saveMd(md);
+
+process.exit(0);

@@ -20,7 +20,7 @@ Options:
   -t, --token-usage   Display the token usage
 Examples:
   scrappy -i input.txt -o output.md
-  scrappy -u https://example.com -o output.md
+  scrappy -u https://example.com -o output
 
 Description:
   Scrappy is a tool that converts any website that can be scraped into a markdown file.
@@ -98,6 +98,7 @@ export function validateArgs(args) {
 
     // check if the input file exists
     if (!fs.existsSync(inputFile)) {
+      console.log(inputFile);
       process.stderr.write("The input file does not exist");
       process.exit(1);
     }
@@ -178,8 +179,8 @@ export async function convertIntoMd(body) {
     " -> " +
     body;
   let response = "";
-  let promptTokens;
-  let responseTokens;
+  let promptTokens = 0;
+  let responseTokens = 0;
 
   const chatCompletion = await groq.chat.completions.create({
     messages: [
@@ -197,12 +198,11 @@ export async function convertIntoMd(body) {
   });
 
   for await (const chunk of chatCompletion) {
-    // process.stdout.write(chunk.choices[0]?.delta?.content || "");
+    process.stdout.write(chunk.choices[0]?.delta?.content || "");
     response += chunk.choices[0]?.delta?.content || "";
-    console.log(chunk);
     if (chunk.x_groq?.usage) {
-      promptTokens = chunk.x_groq?.usage?.prompt_tokens;
-      responseTokens = chunk.x_groq?.usage?.completion_tokens;
+      promptTokens += chunk.x_groq?.usage?.prompt_tokens;
+      responseTokens += chunk.x_groq?.usage?.completion_tokens;
     }
   }
 
@@ -212,9 +212,6 @@ export async function convertIntoMd(body) {
   if (state.tokenUsage) {
     process.stdout.write(`\nPrompt Tokens: ${promptTokens}\n`);
     process.stdout.write(`Response Tokens: ${responseTokens}\n`);
-    process.stdout.write(
-      `Completion Tokens: ${responseTokens + promptTokens}\n`
-    );
   }
 
   return response;
