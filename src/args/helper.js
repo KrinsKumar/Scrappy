@@ -34,6 +34,7 @@ let state = {
   url: "",
   apiKey: "",
   tokenUsage: false,
+  stream: false,
 };
 
 // will validate the arguments provided and populate the state object.
@@ -136,6 +137,11 @@ export function validateArgs(args) {
     state.tokenUsage = true;
   }
 
+  // check if the stream flag is passed --stream/-s
+  if (args.includes("--stream") || args.includes("-s")) {
+    state.stream = true;
+  }
+
   return state;
 }
 
@@ -198,8 +204,10 @@ export async function convertIntoMd(body) {
   });
 
   for await (const chunk of chatCompletion) {
-    process.stdout.write(chunk.choices[0]?.delta?.content || "");
     response += chunk.choices[0]?.delta?.content || "";
+    if (state.stream) {
+      process.stdout.write(chunk.choices[0]?.delta?.content || "");
+    }
     if (chunk.x_groq?.usage) {
       promptTokens += chunk.x_groq?.usage?.prompt_tokens;
       responseTokens += chunk.x_groq?.usage?.completion_tokens;

@@ -19,3 +19,7 @@ node_modules/
 
 #Ignore .env
 .env
+
+# scrappy custom
+files/
+examples/
