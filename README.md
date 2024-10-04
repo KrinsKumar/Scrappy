@@ -41,6 +41,18 @@ or
 scrappy --a <YOUR_API_KEY>
 ```
 
+### Config
+
+To set default options and arguments, you can create a `.scrappy.toml` file in your home directory `/~` with the following config options:
+
+```
+url = "some_url"
+inputFile = "some_input_file"
+outputFile = "some_output_file"
+tokenUsage = true | false
+stream = true | false
+```
+
 ## Features
 
 - **Input**: The main feature is that you can convert any website into a md, For this we will need a url of the page. You can provide a URL either using a file or command line arg.
