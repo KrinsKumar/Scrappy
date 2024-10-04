@@ -47,7 +47,7 @@ export async function validateArgs(args) {
     const configFilePath = path.join(os.homedir(), ".scrappy.toml");
     configOptions = await parseConfig(configFilePath);
   } catch (error) {
-    // If error thrown because config file not found, continue
+    // If file found but couldn't be parsed, exit
     if (error.code !== "ENOENT") {
       process.stderr.write(error.toString());
       process.exit(1);
