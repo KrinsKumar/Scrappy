@@ -43,7 +43,7 @@ scrappy --a <YOUR_API_KEY>
 
 ### Config
 
-To set default options and arguments, you can create a `.scrappy.toml` file in your home directory `/~` with the following config options:
+To set default options and arguments, you can create a `.scrappy.toml` file in your home directory `~/` with the following config options:
 
 ```
 url = "some_url"
