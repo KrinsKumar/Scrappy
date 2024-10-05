@@ -91,8 +91,8 @@ export async function validateArgs(args) {
   process.stdout.write("Validating the arguments... ");
 
   // Use URL CLI option if present
-  // If missing, use URL config option if present
   // If missing, use input file argument if present
+  // If missing, use URL config option if present
   // If missing, use input file config option if present
   // If missing, exit
   if (args.includes("--url") || args.includes("-u")) {
@@ -107,16 +107,20 @@ export async function validateArgs(args) {
       process.stderr.write("Please provide a valid url");
       process.exit(1);
     }
+    
     state.url = args[index + 1];
     state.isInputFile = false;
-  } else if (configOptions?.url) {
-    state.url = configOptions.url;
   } else {
     let [, , inputFile] = args; // Check if the input file is supplied as an argument
-    inputFile = inputFile || configOptions?.inputFile; // If not, try to get it from the config
     if (!inputFile) {
-      process.stderr.write("Please provide the input file");
-      process.exit(1);
+      if (configOptions?.url) {
+        state.url = configOptions.url;
+      } else if (configOptions?.inputFile) {
+        state.inputFile = configOptions.inputFile;
+      } else {
+        process.stderr.write("Please provide the input file");
+        process.exit(1);
+      }
     }
 
     // check if the input file exists
