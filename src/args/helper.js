@@ -1,7 +1,10 @@
 import fs from "fs";
+import fsP from "fs/promises";
+import os from "os";
 import { Groq } from "groq-sdk";
 import path from "path";
 import { fileURLToPath } from "url";
+import TOML from "smol-toml";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -38,7 +41,19 @@ let state = {
 };
 
 // will validate the arguments provided and populate the state object.
-export function validateArgs(args) {
+export async function validateArgs(args) {
+  let configOptions;
+  try {
+    const configFilePath = path.join(os.homedir(), ".scrappy.toml");
+    configOptions = await parseConfig(configFilePath);
+  } catch (error) {
+    // If file found but couldn't be parsed, exit
+    if (error.code !== "ENOENT") {
+      process.stderr.write(error.toString());
+      process.exit(1);
+    }
+  }
+
   // check if the api key is proivded
   if (args.includes("--api-key") || args.includes("-a")) {
     let index;
@@ -75,7 +90,11 @@ export function validateArgs(args) {
 
   process.stdout.write("Validating the arguments... ");
 
-  // check if the the url is provided asx an argument
+  // Use URL CLI option if present
+  // If missing, use input file argument if present
+  // If missing, use URL config option if present
+  // If missing, use input file config option if present
+  // If missing, exit
   if (args.includes("--url") || args.includes("-u")) {
     let index;
     if (args.includes("-u")) {
@@ -88,13 +107,20 @@ export function validateArgs(args) {
       process.stderr.write("Please provide a valid url");
       process.exit(1);
     }
+    
     state.url = args[index + 1];
     state.isInputFile = false;
   } else {
-    const [, , inputFile] = args;
+    let [, , inputFile] = args; // Check if the input file is supplied as an argument
     if (!inputFile) {
-      process.stderr.write("Please provide the input file");
-      process.exit(1);
+      if (configOptions?.url) {
+        state.url = configOptions.url;
+      } else if (configOptions?.inputFile) {
+        state.inputFile = configOptions.inputFile;
+      } else {
+        process.stderr.write("Please provide the input file");
+        process.exit(1);
+      }
     }
 
     // check if the input file exists
@@ -123,6 +149,8 @@ export function validateArgs(args) {
       }
     }
     state.outputFile = args[index + 1];
+  } else if (configOptions?.outputFile) {
+    state.outputFile = configOptions.outputFile;
   }
 
   // check if the token usage flag is passed
@@ -135,11 +163,15 @@ export function validateArgs(args) {
     }
 
     state.tokenUsage = true;
+  } else if (configOptions?.tokenUsage) {
+    state.tokenUsage = configOptions.tokenUsage;
   }
 
   // check if the stream flag is passed --stream/-s
   if (args.includes("--stream") || args.includes("-s")) {
     state.stream = true;
+  } else if (configOptions?.stream) {
+    state.stream = configOptions.stream;
   }
 
   return state;
@@ -232,4 +264,17 @@ export function saveMd(md) {
     // wirte the md to the ipput file
     fs.writeFileSync(state.inputFile + ".md", md);
   }
+}
+
+/**
+ * Parses a TOML config file for options
+ * @param {string} configFilePath Path to .toml config file
+ * @returns {{ url: string | undefined, inputFile: string | undefined, outputFile: string | undefined, tokenUsage: boolean | undefined, stream: boolean | undefined }} An object containing the parsed options
+ */
+export async function parseConfig(configFilePath) {
+  const configfileContent = await fsP.readFile(configFilePath, {
+    encoding: "utf8",
+  });
+  const configOptions = TOML.parse(configfileContent);
+  return configOptions;
 }

@@ -3,7 +3,7 @@ import fs from "fs";
 import { validateArgs, getUrlBody, convertIntoMd, saveMd } from "./helper.js";
 
 // Check if both input and output file names are provided
-let state = validateArgs(process.argv);
+let state = await validateArgs(process.argv);
 if (!state) {
   process.exit(1);
 }
