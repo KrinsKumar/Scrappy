@@ -8,7 +8,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/args/command.js"
+    "start": "node src/args/command.js",
+    "prettier": "prettier --write ./src",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +21,10 @@
     "dotenv": "^16.4.5",
     "groq-sdk": "^0.7.0",
     "smol-toml": "^1.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.14.0",
+    "globals": "^15.11.0",
+    "prettier": "^3.3.3"
   }
 }
