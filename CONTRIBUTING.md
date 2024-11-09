@@ -21,6 +21,11 @@ We welcome contributions to improve **Repo Insights**. If you have suggestions, 
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Create a new Pull Request.
 
+## Testing
+
+After you make your changes, add appropriate tests in the tests file and make sure all of the tests are passing.
+You can run the tests by running `npm run test` in the terminal
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

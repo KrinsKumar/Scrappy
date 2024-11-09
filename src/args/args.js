@@ -1,3 +1,35 @@
+import { getConfigOptions } from './helper.js'
+import path from 'path'
+import fs from 'fs'
+
+let state = {
+  isInputFile: false, // is input file provided or url provided
+  inputFile: '',
+  outputFile: '',
+  url: '',
+  apiKey: '',
+  tokenUsage: false,
+  stream: false
+}
+
+const helpTxt = `Usage: scrappy [options] <inputFile> <outputFile> <url>
+
+Options:
+  -h, --help          Display this help message
+  -i, --input         Specify the input file
+  -o, --output        Specify the output file
+  -u, --url           Specify the URL to scrape
+  -v, --version       DIsplay the version of the tool
+  -t, --token-usage   Display the token usage
+Examples:
+  scrappy -i input.txt -o output.md
+  scrappy -u https://example.com -o output
+
+Description:
+  Scrappy is a tool that converts any website that can be scraped into a markdown file.
+  You can specify an input file, output file, or URL to scrape.
+`
+
 export async function validateArgs(args) {
   let configOptions = getConfigOptions()
 

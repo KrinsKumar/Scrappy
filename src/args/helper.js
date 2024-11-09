@@ -6,28 +6,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import TOML from 'smol-toml'
 import dotenv from 'dotenv'
+import { get } from 'http'
 dotenv.config()
-
-// Get the current file path and directory
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const helpTxt = `Usage: scrappy [options] <inputFile> <outputFile> <url>
-
-Options:
-  -h, --help          Display this help message
-  -i, --input         Specify the input file
-  -o, --output        Specify the output file
-  -u, --url           Specify the URL to scrape
-  -v, --version       DIsplay the version of the tool
-  -t, --token-usage   Display the token usage
-Examples:
-  scrappy -i input.txt -o output.md
-  scrappy -u https://example.com -o output
-
-Description:
-  Scrappy is a tool that converts any website that can be scraped into a markdown file.
-  You can specify an input file, output file, or URL to scrape.
-`
 
 let state = {
   isInputFile: false, // is input file provided or url provided
@@ -64,18 +44,19 @@ export async function getUrlBody(url) {
 
 export async function convertIntoMd(body) {
   const apiKey = state.apiKey ? state.apiKey : process.env.GROQ_API_KEY
-
   if (!apiKey) {
     process.stderr.write(
       'API Key is missing. Add an api key using --api-key or -a flag'
     )
     process.exit(1)
   }
-
   const groq = new Groq({
     apiKey: apiKey
   })
+  return await getGroqResponse(body, groq)
+}
 
+export async function getGroqResponse(body, groq) {
   let system_message =
     'You are given a body of a webpage, Convert the body into markdown. Make sure that the style nd the structure of the page is preserved.' +
     'make sure you are not leaving any incomplete bullet points' +
@@ -111,9 +92,6 @@ export async function convertIntoMd(body) {
       responseTokens += chunk.x_groq?.usage?.completion_tokens
     }
   }
-
-  //remove the first line
-  response = response.substring(response.indexOf('\n') + 1)
 
   if (state.tokenUsage) {
     process.stdout.write(`\nPrompt Tokens: ${promptTokens}\n`)
