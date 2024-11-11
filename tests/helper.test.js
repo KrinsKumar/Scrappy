@@ -6,6 +6,7 @@ import {
   saveMd,
   getGroqResponse
 } from '../src/args/helper.js'
+import fs from 'fs'
 
 const content =
   '```markdown\n# My Awesome Blog\n\nThis is a blog post about my awesome blog\n\n## Introduction\n\nThis is the introduction to my awesome blog\n\n## Body\n\nThis is the body of my awesome blog\n\n## Conclusion\n\nThis is the conclusion of my awesome blog\n```'
@@ -55,5 +56,17 @@ describe('convertIntoMd', () => {
     let md = await getGroqResponse(body, groq)
     expect(md).not.toBeNull()
     expect(md).toEqual(content)
+  })
+})
+
+describe('Output File is created', () => {
+  test('should create an output file', () => {
+    let markdown = 'This is a test markdown'
+    const file = './files/input.txt'
+    const filePath = './files/input.txt.md'
+    updateState({ outputFile: file })
+    saveMd(markdown)
+    const fileContent = fs.readFileSync(filePath, 'utf8')
+    expect(fileContent).toEqual(markdown)
   })
 })
