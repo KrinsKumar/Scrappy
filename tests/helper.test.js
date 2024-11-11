@@ -55,7 +55,7 @@ describe('convertIntoMd', () => {
     let body = 'the body of the webpage'
     let md = await getGroqResponse(body, groq)
     expect(md).not.toBeNull()
-    expect(md).toEqual(content)
+    expect(md).toEqual(content + ' ') // added to fail the test
   })
 })
 
