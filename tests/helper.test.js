@@ -69,4 +69,13 @@ describe('Output File is created', () => {
     const fileContent = fs.readFileSync(filePath, 'utf8')
     expect(fileContent).toEqual(markdown)
   })
+  test('shoud write the md to the input file if outfile file is provided', () => {
+    let markdown = 'This is a test markdown for no output file is provided'
+    const file = './files/input.txt'
+    const filePath = './files/input.txt.md'
+    updateState({ inputFile: file })
+    saveMd(markdown)
+    const fileContent = fs.readFileSync(filePath, 'utf8')
+    expect(fileContent).toEqual(markdown)
+  })
 })
