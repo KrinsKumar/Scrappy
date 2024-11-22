@@ -24,26 +24,19 @@
 
 ![](assets/scrappy-demo.gif)
 
-1. Download the repo.
-2. Run the following commands with the updated path variable that points to the location of the repo, run with `sudo` if there is a permission issue.
+1. Download the repo, using `npm i -g scrappy-cli`
+
+2. You will need [groq](https://console.groq.com/) API key to convert from page to md. Once you obtain you key, run the following command to update the key in you system.
 
 ```
-npm i
-chmod +x /<PATH>/Scrappy/src/args/command.js
-ln -s /<PATH>/Scrappy/src/args/command.js /usr/local/bin/scrappy
-```
-
-3. You will need [groq](https://console.groq.com/) API key to convert from page to md. Once you obtain you key, run the following command to update the key in you system.
-
-```
-scrappy --api-key <YOUR_API_KEY>
+scrappy-cli --api-key <YOUR_API_KEY>
 or
-scrappy --a <YOUR_API_KEY>
+scrappy-cli --a <YOUR_API_KEY>
 ```
 
-### Config
+### Config - Optional
 
-To set default options and arguments, you can create a `.scrappy.toml` file in your home directory `~/` with the following config options:
+If you dont feel like passing the configs every time you run the command you can create a config file in the form of `toml` To set default options and arguments, you can create a `.scrappy.toml` file in your home directory `~/` with the following config options:
 
 ```
 url = "some_url"
@@ -60,15 +53,15 @@ stream = true | false
   1. **URL using a file (default)**: Add the url in the file and pass the file location onto the command line. The file should contain one line that has the url of the page that you want to scrap.
 
   ```
-  scrappy files/input.txt
+  scrappy-cli files/input.txt
   ```
 
   2. **URL using command line arg**: Pass the url using the `-url` flag.
 
   ```
-  scrappy --url https://www.senecapolytechnic.ca/cgi-bin/subject?s1=OSD600
+  scrappy-cli --url https://www.senecapolytechnic.ca/cgi-bin/subject?s1=OSD600
   or
-  scrappy -u https://www.senecapolytechnic.ca/cgi-bin/subject?s1=OSD600
+  scrappy-cli -u https://www.senecapolytechnic.ca/cgi-bin/subject?s1=OSD600
   ```
 
 - **Output**: The convert md can be stored in a preferred file if the file is passed using `-0` flag.
@@ -76,16 +69,16 @@ stream = true | false
   1. **If the file is passed**: The final md will be stored in the output.md file in the files folder.
 
   ```
-  scrappy files/input.txt -0 files/
+  scrappy-cli files/input.txt -0 files/
   or
-  scrappy files/input.txt --output files/output
+  scrappy-cli files/input.txt --output files/output
   ```
 
   2. **The md is stored in the input file (default)**: A new md file will be created in the same folder of the input file with the updated md. In this case, a new file will be created `input.txt.md` in the same folder as the input.txt.
 
   ```
-  scrappy files/input.txt
+  scrappy-cli files/input.txt
   ```
 
   - **Token Usage**: When the program is run with the --token-usage/-t flag set, extra information will be reported to stderr about the number of tokens that were sent in the prompt and returned in the completion.
-    `scrappy files/input.txt --output files/output -t`
+    `scrappy-cli files/input.txt --output files/output -t`
