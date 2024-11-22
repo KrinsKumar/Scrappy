@@ -1,17 +1,18 @@
 {
-  "name": "scrappy",
-  "version": "1.0.0",
-  "description": "Scrappy",
-  "main": "index.js",
+  "name": "scrappy-cli",
+  "version": "1.0.1",
+  "description": "Scrappy is a tool used to convert url to markdown using LLM",
+  "main": "src/args/command.js",
   "bin": {
-    "scrappy": "./src/args/command.js"
+    "scrappy-cli": "src/args/command.js"
   },
   "scripts": {
     "test": "jest",
     "start": "node src/args/command.js",
     "prettier": "prettier --write ./src",
     "lint": "eslint ./src",
-    "lint:fix": "eslint ./src --fix"
+    "lint:fix": "eslint ./src --fix",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags"
   },
   "keywords": [],
   "author": "",
