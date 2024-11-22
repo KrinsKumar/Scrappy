@@ -1,6 +1,6 @@
 {
   "name": "scrappy-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Scrappy is a tool used to convert url to markdown using LLM",
   "main": "src/args/command.js",
   "bin": {
